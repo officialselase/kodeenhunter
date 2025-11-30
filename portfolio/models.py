@@ -89,6 +89,7 @@ class ProjectEquipment(models.Model):
 class ContactSubmission(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
+    phone = models.CharField(max_length=50, blank=True)
     project_type = models.CharField(max_length=100)
     budget = models.CharField(max_length=50, blank=True)
     message = models.TextField()

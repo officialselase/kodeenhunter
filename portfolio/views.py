@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Category, Project, ContactSubmission
@@ -44,9 +44,12 @@ class ProjectViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class ContactViewSet(viewsets.ViewSet):
-    def create(self, request):
-        serializer = ContactSubmissionSerializer(data=request.data)
+class ContactSubmissionView(generics.CreateAPIView):
+    queryset = ContactSubmission.objects.all()
+    serializer_class = ContactSubmissionSerializer
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(

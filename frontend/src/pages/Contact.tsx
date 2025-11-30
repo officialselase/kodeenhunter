@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send, MapPin, Mail, Phone, Instagram, Youtube, Twitter } from 'lucide-react'
+import { portfolioApi } from '../services/api'
 
 const contactInfo = [
   { icon: MapPin, label: 'Location', value: 'Los Angeles, California' },
@@ -27,19 +28,36 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    projectType: '',
+    phone: '',
+    project_type: '',
     budget: '',
     message: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitting(false)
-    setSubmitted(true)
+    setError('')
+
+    try {
+      await portfolioApi.submitContact({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        project_type: formData.project_type,
+        message: formData.message,
+        budget: formData.budget || undefined,
+      })
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Contact form error:', err)
+      setError('Unable to send your message. Please try again or email directly at hello@kodeenhunter.com')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -145,6 +163,12 @@ const Contact = () => {
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm">
+                      {error}
+                    </div>
+                  )}
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium mb-2">Name</label>
@@ -176,8 +200,8 @@ const Contact = () => {
                     <div>
                       <label className="block text-sm font-medium mb-2">Project Type</label>
                       <select
-                        name="projectType"
-                        value={formData.projectType}
+                        name="project_type"
+                        value={formData.project_type}
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 border border-kodeen-gray-200 rounded-lg focus:outline-none focus:border-kodeen-black transition-colors bg-white"
@@ -205,6 +229,18 @@ const Contact = () => {
                         <option value="50k-plus">$50,000+</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Phone (Optional)</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-kodeen-gray-200 rounded-lg focus:outline-none focus:border-kodeen-black transition-colors"
+                      placeholder="+1 (555) 000-0000"
+                    />
                   </div>
 
                   <div>

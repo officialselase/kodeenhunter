@@ -1,10 +1,10 @@
 # Kodeen Hunter - Videographer Portfolio
 
 ## Overview
-A world-class minimalist portfolio website for Kodeen Hunter, a professional videographer. Features stunning animations, 3D elements, video showcase, and an integrated shop.
+A world-class minimalist portfolio website for Kodeen Hunter, a professional videographer. Features stunning animations, 3D elements, video showcase, and an integrated shop with Django backend for content management.
 
 ## Tech Stack
-- **Frontend**: React 18, TypeScript, Tailwind CSS, Framer Motion, Three.js
+- **Frontend**: React 18, TypeScript, Tailwind CSS v4, Framer Motion, Three.js
 - **Backend**: Django 5.x, Django REST Framework
 - **Database**: SQLite (development)
 
@@ -16,6 +16,7 @@ A world-class minimalist portfolio website for Kodeen Hunter, a professional vid
 │   │   ├── components/   # Reusable UI components
 │   │   ├── pages/        # Page components
 │   │   ├── context/      # React context (Cart)
+│   │   ├── services/     # API service layer
 │   │   └── hooks/        # Custom hooks
 │   └── public/           # Static assets
 ├── backend/           # Django settings
@@ -27,18 +28,19 @@ A world-class minimalist portfolio website for Kodeen Hunter, a professional vid
 ```
 
 ## Key Features
-- Animated intro sequence (QR code → clapperboard → heartbeat logo)
-- 3D film reel element using Three.js
-- Video portfolio with category filters
-- Shop with cart functionality
-- Contact form with booking inquiry
+- Animated intro sequence (QR code dissolving into clapperboard with heartbeat logo)
+- 3D film reel element using Three.js with WebGL fallback
+- Video portfolio with category filters and lightbox
+- Shop with cart functionality and checkout API
+- Contact form with booking inquiry (submits to Django API)
 - Fully responsive design
-- VR-ready with WebXR support
+- VR-ready with WebXR detection and support
+- Dynamic content from Django REST API with fallback data
 
 ## Running the Application
 The application runs both servers:
-- Frontend (React): Port 5000
-- Backend (Django): Port 8000
+- Frontend (React): Port 5000 - Webview accessible
+- Backend (Django): Port 8000 - API server
 
 ## Admin Access
 - URL: /admin/
@@ -46,21 +48,32 @@ The application runs both servers:
 - Password: admin123
 
 ## API Endpoints
-- `/api/portfolio/projects/` - Portfolio projects
-- `/api/portfolio/categories/` - Project categories
-- `/api/portfolio/contact/` - Contact form submissions
-- `/api/shop/products/` - Shop products
-- `/api/shop/categories/` - Product categories
-- `/api/shop/orders/` - Order management
+- `/api/portfolio/projects/` - Portfolio projects (GET)
+- `/api/portfolio/projects/featured/` - Featured projects (GET)
+- `/api/portfolio/categories/` - Project categories (GET)
+- `/api/portfolio/contact/` - Contact form submissions (POST)
+- `/api/shop/products/` - Shop products (GET)
+- `/api/shop/products/featured/` - Featured products (GET)
+- `/api/shop/categories/` - Product categories (GET)
+- `/api/shop/orders/` - Order management (POST)
+
+## Design Choices
+- All-white background for clean, minimalist aesthetic that makes videos pop
+- Grayscale to color transitions on hover for visual interest
+- Custom heartbeat logo serves as loading animation
+- Smooth page transitions with Framer Motion
 
 ## User Preferences
-- All-white background for clean, minimalist aesthetic
+- All-white background for maximum visual impact
 - Cross-browser and VR compatible
 - Mobile-first responsive design
+- Skip intro animation with `?skip=true` URL parameter
 
-## Recent Changes
-- Initial project setup with full stack implementation
-- Created stunning intro animation sequence
-- Built 3D camera element with Three.js
-- Implemented portfolio, shop, about, and contact pages
-- Set up Django admin for content management
+## Recent Changes (November 30, 2025)
+- Added API service layer for frontend-backend integration
+- Updated Portfolio, Shop, Home, and Contact pages to use Django API
+- Added fallback data for offline/demo mode
+- Enhanced 3D component with WebXR/VR detection
+- Added Cart checkout functionality with API integration
+- Added TypeScript Vite environment types
+- Improved WebGL context loss handling

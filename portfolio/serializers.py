@@ -60,6 +60,15 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
 
 
 class ContactSubmissionSerializer(serializers.ModelSerializer):
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    budget = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    project_type = serializers.CharField(required=True)
+    
     class Meta:
         model = ContactSubmission
-        fields = ['id', 'name', 'email', 'project_type', 'budget', 'message']
+        fields = ['id', 'name', 'email', 'phone', 'project_type', 'budget', 'message']
+    
+    def validate_project_type(self, value):
+        if not value or value.strip() == '':
+            raise serializers.ValidationError('Please select a project type')
+        return value

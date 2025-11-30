@@ -1,28 +1,44 @@
-import { useRef, Suspense } from 'react'
+import { useRef, Suspense, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Play, ArrowRight, Award, Film, Users } from 'lucide-react'
 import Camera3D from '../components/Camera3D'
 import HeartbeatLoader from '../components/HeartbeatLoader'
+import { portfolioApi, Project } from '../services/api'
 
-const featuredProjects = [
+const fallbackProjects = [
   {
     id: 1,
     title: 'Midnight Echoes',
-    category: 'Music Video',
+    slug: 'midnight-echoes',
+    category: { id: 1, name: 'Music Video', slug: 'music-videos' },
     thumbnail: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80',
+    video_url: '',
+    description: '',
+    year: 2024,
+    featured: true,
   },
   {
     id: 2,
     title: 'Urban Pulse',
-    category: 'Commercial',
+    slug: 'urban-pulse',
+    category: { id: 2, name: 'Commercial', slug: 'commercials' },
     thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&q=80',
+    video_url: '',
+    description: '',
+    year: 2024,
+    featured: true,
   },
   {
     id: 3,
     title: 'Beyond the Frame',
-    category: 'Short Film',
+    slug: 'beyond-the-frame',
+    category: { id: 3, name: 'Short Film', slug: 'short-films' },
     thumbnail: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80',
+    video_url: '',
+    description: '',
+    year: 2023,
+    featured: true,
   },
 ]
 
@@ -34,6 +50,8 @@ const stats = [
 
 const Home = () => {
   const heroRef = useRef<HTMLDivElement>(null)
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>(fallbackProjects)
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
@@ -42,6 +60,20 @@ const Home = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1])
   const y = useTransform(scrollYProgress, [0, 0.5], [0, 100])
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const data = await portfolioApi.getFeaturedProjects()
+        if (data.length > 0) {
+          setFeaturedProjects(data.slice(0, 3))
+        }
+      } catch (error) {
+        console.log('Using fallback featured projects:', error)
+      }
+    }
+    fetchFeatured()
+  }, [])
 
   return (
     <div className="bg-white">
@@ -198,7 +230,7 @@ const Home = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Link to={`/portfolio/${project.id}`} className="group block">
+                <Link to={`/portfolio/${project.slug || project.id}`} className="group block">
                   <div className="portfolio-card aspect-[4/5] rounded-lg overflow-hidden mb-4">
                     <img
                       src={project.thumbnail}
@@ -215,7 +247,7 @@ const Home = () => {
                     </div>
                   </div>
                   <p className="text-kodeen-gray-400 text-xs tracking-wider uppercase mb-1">
-                    {project.category}
+                    {project.category.name}
                   </p>
                   <h3 className="font-display text-xl font-medium group-hover:text-kodeen-gray-600 transition-colors">
                     {project.title}

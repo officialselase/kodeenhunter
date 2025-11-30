@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
+import { shopApi } from '../services/api'
 
 interface CartItem {
   id: number
@@ -8,20 +9,28 @@ interface CartItem {
   image: string
 }
 
+interface CheckoutData {
+  customer_name: string
+  customer_email: string
+}
+
 interface CartContextType {
   items: CartItem[]
   addItem: (item: Omit<CartItem, 'quantity'>) => void
   removeItem: (id: number) => void
   updateQuantity: (id: number, quantity: number) => void
   clearCart: () => void
+  checkout: (data: CheckoutData) => Promise<{ success: boolean; orderNumber?: string; error?: string }>
   itemCount: number
   total: number
+  isCheckingOut: boolean
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([])
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
 
   const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems((prevItems) => {
@@ -57,12 +66,50 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems([])
   }
 
+  const checkout = async (data: CheckoutData): Promise<{ success: boolean; orderNumber?: string; error?: string }> => {
+    if (items.length === 0) {
+      return { success: false, error: 'Cart is empty' }
+    }
+
+    setIsCheckingOut(true)
+
+    try {
+      const orderData = {
+        customer_name: data.customer_name,
+        customer_email: data.customer_email,
+        items: items.map((item) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+        })),
+      }
+
+      const response = await shopApi.createOrder(orderData) as { order_number?: string }
+      clearCart()
+      return { success: true, orderNumber: response.order_number }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      return { success: false, error: 'Unable to process your order. Please try again or contact support.' }
+    } finally {
+      setIsCheckingOut(false)
+    }
+  }
+
   const itemCount = items.reduce((count, item) => count + item.quantity, 0)
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, clearCart, itemCount, total }}
+      value={{ 
+        items, 
+        addItem, 
+        removeItem, 
+        updateQuantity, 
+        clearCart, 
+        checkout,
+        itemCount, 
+        total,
+        isCheckingOut
+      }}
     >
       {children}
     </CartContext.Provider>
