@@ -4,6 +4,10 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    include: ['@react-three/fiber', '@react-three/drei', 'three'],
+    force: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

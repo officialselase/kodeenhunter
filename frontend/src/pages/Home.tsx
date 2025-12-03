@@ -1,9 +1,7 @@
-import { useRef, Suspense, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Play, ArrowRight, Award, Film, Users } from 'lucide-react'
-import Camera3D from '../components/Camera3D'
-import HeartbeatLoader from '../components/HeartbeatLoader'
 import { portfolioApi, Project } from '../services/api'
 
 const fallbackProjects = [
@@ -145,9 +143,24 @@ const Home = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
             className="hidden lg:block"
           >
-            <Suspense fallback={<HeartbeatLoader />}>
-              <Camera3D />
-            </Suspense>
+            <div className="w-full h-full min-h-[400px] flex items-center justify-center">
+              <svg width="200" height="200" viewBox="0 0 200 200" className="animate-spin-slow">
+                <circle cx="100" cy="100" r="80" stroke="#0a0a0a" strokeWidth="3" fill="none" opacity="0.3" />
+                <circle cx="100" cy="100" r="60" stroke="#0a0a0a" strokeWidth="2" fill="none" opacity="0.5" />
+                <circle cx="100" cy="100" r="20" fill="#0a0a0a" />
+                {[...Array(8)].map((_, i) => (
+                  <rect
+                    key={i}
+                    x={100 + Math.cos((i * Math.PI * 2) / 8) * 70 - 5}
+                    y={100 + Math.sin((i * Math.PI * 2) / 8) * 70 - 10}
+                    width="10"
+                    height="20"
+                    fill="#0a0a0a"
+                    opacity="0.7"
+                  />
+                ))}
+              </svg>
+            </div>
           </motion.div>
         </div>
 
