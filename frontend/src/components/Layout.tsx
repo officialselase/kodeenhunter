@@ -1,9 +1,13 @@
-import { ReactNode, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { ReactNode, useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ShoppingBag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { useScrollRestoration } from '../hooks/useScrollRestoration'
 import Cart from './Cart'
+import BookingWidget from './BookingWidget'
+import SkipToContent from './SkipToContent'
+import BrowserWarning from './BrowserWarning'
 
 interface LayoutProps {
   children: ReactNode
@@ -19,14 +23,41 @@ const navLinks = [
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
   const { itemCount } = useCart()
 
+  // Scroll restoration on route change
+  useScrollRestoration()
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location.pathname])
+
+  // Preload critical routes on hover
+  const handleLinkHover = (path: string) => {
+    const link = document.createElement('link')
+    link.rel = 'prefetch'
+    link.href = path
+    document.head.appendChild(link)
+  }
+
+  // Handle navigation with proper state management
+  const handleNavClick = (path: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    setMobileMenuOpen(false)
+    setTimeout(() => navigate(path), 100)
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md">
-        <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+      <SkipToContent />
+      <BrowserWarning />
+      
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md" role="banner">
+        <nav className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between" aria-label="Main navigation">
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
               className="relative"
@@ -62,6 +93,7 @@ const Layout = ({ children }: LayoutProps) => {
               <Link
                 key={link.path}
                 to={link.path}
+                onMouseEnter={() => handleLinkHover(link.path)}
                 className={`nav-link ${
                   location.pathname === link.path ? 'text-kodeen-black' : 'text-kodeen-gray-500'
                 }`}
@@ -75,10 +107,11 @@ const Layout = ({ children }: LayoutProps) => {
             <button
               onClick={() => setCartOpen(true)}
               className="relative p-2 hover:bg-kodeen-gray-100 rounded-full transition-colors"
+              aria-label={`Shopping cart with ${itemCount} items`}
             >
               <ShoppingBag className="w-5 h-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-kodeen-black text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-kodeen-black text-white text-xs rounded-full flex items-center justify-center" aria-hidden="true">
                   {itemCount}
                 </span>
               )}
@@ -87,6 +120,8 @@ const Layout = ({ children }: LayoutProps) => {
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden p-2 hover:bg-kodeen-gray-100 rounded-full transition-colors"
+              aria-label="Open mobile menu"
+              aria-expanded={mobileMenuOpen}
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -107,11 +142,12 @@ const Layout = ({ children }: LayoutProps) => {
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 hover:bg-kodeen-gray-100 rounded-full transition-colors"
+                aria-label="Close mobile menu"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <nav className="flex flex-col items-center justify-center h-[calc(100vh-100px)] gap-8">
+            <nav className="flex flex-col items-center justify-center h-[calc(100vh-100px)] gap-8" aria-label="Mobile navigation">
               {navLinks.map((link, index) => (
                 <motion.div
                   key={link.path}
@@ -121,7 +157,7 @@ const Layout = ({ children }: LayoutProps) => {
                 >
                   <Link
                     to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={(e) => handleNavClick(link.path, e)}
                     className={`text-3xl font-display font-medium ${
                       location.pathname === link.path
                         ? 'text-kodeen-black'
@@ -138,8 +174,9 @@ const Layout = ({ children }: LayoutProps) => {
       </AnimatePresence>
 
       <Cart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <BookingWidget />
 
-      <main className="pt-20">
+      <main id="main-content" className="pt-20" role="main">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -153,7 +190,7 @@ const Layout = ({ children }: LayoutProps) => {
         </AnimatePresence>
       </main>
 
-      <footer className="bg-white border-t border-kodeen-gray-100 mt-20">
+      <footer className="bg-white border-t border-kodeen-gray-100 mt-20" role="contentinfo">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="grid md:grid-cols-4 gap-10">
             <div className="md:col-span-2">

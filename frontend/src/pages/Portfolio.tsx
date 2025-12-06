@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, X } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { portfolioApi, Project, Category } from '../services/api'
+import ProjectModal from '../components/ProjectModal'
 
 const fallbackProjects = [
   {
@@ -76,7 +77,7 @@ const Portfolio = () => {
   const [projects, setProjects] = useState<Project[]>(fallbackProjects)
   const [categories, setCategories] = useState<Category[]>([])
   const [activeCategory, setActiveCategory] = useState('All')
-  const [selectedProject, setSelectedProject] = useState<number | null>(null)
+  const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -110,6 +111,20 @@ const Portfolio = () => {
   const filteredProjects = activeCategory === 'All'
     ? projects
     : projects.filter((p) => p.category.name === activeCategory)
+
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    if (!selectedProject) return
+    const currentIndex = filteredProjects.findIndex((p) => p.slug === selectedProject)
+    if (direction === 'prev' && currentIndex > 0) {
+      setSelectedProject(filteredProjects[currentIndex - 1].slug)
+    } else if (direction === 'next' && currentIndex < filteredProjects.length - 1) {
+      setSelectedProject(filteredProjects[currentIndex + 1].slug)
+    }
+  }
+
+  const currentProjectIndex = selectedProject
+    ? filteredProjects.findIndex((p) => p.slug === selectedProject)
+    : -1
 
   return (
     <div className="bg-white min-h-screen">
@@ -166,7 +181,7 @@ const Portfolio = () => {
                     transition={{ delay: index * 0.05 }}
                   >
                     <div
-                      onClick={() => setSelectedProject(project.id)}
+                      onClick={() => setSelectedProject(project.slug)}
                       className="group cursor-pointer"
                     >
                       <div className="portfolio-card aspect-video rounded-lg overflow-hidden mb-4">
@@ -206,60 +221,13 @@ const Portfolio = () => {
 
       <AnimatePresence>
         {selectedProject && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6"
-            onClick={() => setSelectedProject(null)}
-          >
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
-            >
-              <X className="w-6 h-6 text-white" />
-            </motion.button>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="w-full max-w-5xl aspect-video bg-kodeen-gray-900 rounded-lg overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const project = projects.find((p) => p.id === selectedProject)
-                return project ? (
-                  <div className="relative w-full h-full">
-                    {project.video_url ? (
-                      <iframe
-                        src={project.video_url}
-                        title={project.title}
-                        className="w-full h-full"
-                        allowFullScreen
-                      />
-                    ) : (
-                      <>
-                        <img
-                          src={project.thumbnail}
-                          alt={project.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                          <div className="text-center text-white">
-                            <Play className="w-20 h-20 mx-auto mb-4" />
-                            <p className="text-lg">Video Preview</p>
-                            <p className="text-sm text-white/60 mt-2">{project.title}</p>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : null
-              })()}
-            </motion.div>
-          </motion.div>
+          <ProjectModal
+            projectSlug={selectedProject}
+            onClose={() => setSelectedProject(null)}
+            onNavigate={handleNavigate}
+            hasPrev={currentProjectIndex > 0}
+            hasNext={currentProjectIndex < filteredProjects.length - 1}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -1,0 +1,15 @@
+# Kodeen Hunter Portfolio - Robots.txt
+# Allow all crawlers
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://kodeenhunter.com/sitemap.xml
+
+# Disallow admin and API endpoints
+Disallow: /admin/
+Disallow: /api/
+
+# Crawl delay (optional, helps prevent server overload)
+Crawl-delay: 1

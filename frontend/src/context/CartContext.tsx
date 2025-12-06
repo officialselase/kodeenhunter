@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { shopApi } from '../services/api'
+import { secureStorage } from '../utils/security'
 
 interface CartItem {
   id: number
@@ -28,9 +29,20 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+const CART_STORAGE_KEY = 'kodeen_cart'
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([])
+  const [items, setItems] = useState<CartItem[]>(() => {
+    // Load cart from localStorage on mount
+    const stored = secureStorage.getItem(CART_STORAGE_KEY)
+    return stored || []
+  })
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+
+  // Persist cart to localStorage whenever it changes
+  useEffect(() => {
+    secureStorage.setItem(CART_STORAGE_KEY, items)
+  }, [items])
 
   const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems((prevItems) => {
@@ -64,6 +76,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = () => {
     setItems([])
+    secureStorage.removeItem(CART_STORAGE_KEY)
   }
 
   const checkout = async (data: CheckoutData): Promise<{ success: boolean; orderNumber?: string; error?: string }> => {
@@ -83,9 +96,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         })),
       }
 
-      const response = await shopApi.createOrder(orderData) as { order_number?: string }
+      const response = await shopApi.createOrder(orderData) as { order?: { order_number: string } }
       clearCart()
-      return { success: true, orderNumber: response.order_number }
+      return { success: true, orderNumber: response.order?.order_number }
     } catch (error) {
       console.error('Checkout error:', error)
       return { success: false, error: 'Unable to process your order. Please try again or contact support.' }

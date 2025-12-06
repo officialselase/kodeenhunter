@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
+import { useState } from 'react'
+import Checkout from './Checkout'
 
 interface CartProps {
   isOpen: boolean
@@ -9,25 +11,34 @@ interface CartProps {
 
 const Cart = ({ isOpen, onClose }: CartProps) => {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart()
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+
+  const handleCheckout = () => {
+    setCheckoutOpen(true)
+    onClose() // Close cart when opening checkout
+  }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/20 z-50"
-          />
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-2xl"
-          >
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              key="cart-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/20 z-50"
+            />
+            <motion.div
+              key="cart-panel"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-2xl"
+            >
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between p-6 border-b border-kodeen-gray-100">
                 <h2 className="font-display text-xl font-semibold">Your Cart</h2>
@@ -107,7 +118,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                     <span className="text-kodeen-gray-500">Subtotal</span>
                     <span className="font-semibold">${total.toFixed(2)}</span>
                   </div>
-                  <button className="btn-primary w-full text-center">
+                  <button onClick={handleCheckout} className="btn-primary w-full text-center">
                     Checkout
                   </button>
                   <button
@@ -121,8 +132,11 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
             </div>
           </motion.div>
         </>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+      
+      <Checkout isOpen={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+    </>
   )
 }
 

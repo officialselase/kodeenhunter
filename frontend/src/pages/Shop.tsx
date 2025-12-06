@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, Check, Eye } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { shopApi, Product } from '../services/api'
+import ProductModal from '../components/ProductModal'
 
 const fallbackProducts = [
   {
@@ -96,6 +97,7 @@ const Shop = () => {
   const [activeCategory, setActiveCategory] = useState('All')
   const [addedItems, setAddedItems] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const { addItem } = useCart()
 
   useEffect(() => {
@@ -197,10 +199,32 @@ const Shop = () => {
                         alt={product.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <button className="bg-white text-kodeen-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-kodeen-gray-100 transition-colors">
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+                        <button 
+                          onClick={() => setSelectedProduct(product)}
+                          className="bg-white text-kodeen-black px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-kodeen-gray-100 transition-colors"
+                        >
                           <Eye className="w-4 h-4" /> Quick View
                         </button>
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleAddToCart(product)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all ${
+                            addedItems.includes(product.id)
+                              ? 'bg-green-500 text-white'
+                              : 'bg-kodeen-black text-white hover:bg-kodeen-gray-800'
+                          }`}
+                        >
+                          {addedItems.includes(product.id) ? (
+                            <>
+                              <Check className="w-4 h-4" /> Added
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingBag className="w-4 h-4" /> Add to Cart
+                            </>
+                          )}
+                        </motion.button>
                       </div>
                       <span className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-xs font-medium">
                         {product.category.name}
@@ -216,7 +240,7 @@ const Shop = () => {
                       {product.name}
                     </h3>
                     <p className="text-kodeen-gray-500 text-sm mb-3">
-                      {product.description}
+                      {product.short_description || product.description}
                     </p>
 
                     <ul className="mb-4 space-y-1">
@@ -227,36 +251,15 @@ const Shop = () => {
                       ))}
                     </ul>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-display text-xl font-bold">
-                          ${product.current_price.toFixed(2)}
+                    <div className="flex items-center gap-2">
+                      <span className="font-display text-xl font-bold">
+                        ${product.current_price.toFixed(2)}
+                      </span>
+                      {product.sale_price && (
+                        <span className="text-kodeen-gray-400 line-through text-sm">
+                          ${parseFloat(product.price).toFixed(2)}
                         </span>
-                        {product.sale_price && (
-                          <span className="text-kodeen-gray-400 line-through text-sm">
-                            ${parseFloat(product.price).toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                      <motion.button
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleAddToCart(product)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all ${
-                          addedItems.includes(product.id)
-                            ? 'bg-green-500 text-white'
-                            : 'bg-kodeen-black text-white hover:bg-kodeen-gray-800'
-                        }`}
-                      >
-                        {addedItems.includes(product.id) ? (
-                          <>
-                            <Check className="w-4 h-4" /> Added
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingBag className="w-4 h-4" /> Add to Cart
-                          </>
-                        )}
-                      </motion.button>
+                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -283,6 +286,12 @@ const Shop = () => {
           </motion.div>
         </div>
       </section>
+
+      <ProductModal 
+        product={selectedProduct}
+        isOpen={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   )
 }
