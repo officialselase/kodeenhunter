@@ -93,7 +93,7 @@ const fallbackProducts = [
 ]
 
 const Shop = () => {
-  const [products, setProducts] = useState<Product[]>(fallbackProducts)
+  const [products, setProducts] = useState<Product[]>([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [addedItems, setAddedItems] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
@@ -104,11 +104,11 @@ const Shop = () => {
     const fetchProducts = async () => {
       try {
         const data = await shopApi.getProducts()
-        if (data.length > 0) {
-          setProducts(data)
-        }
+        setProducts(data)
       } catch (error) {
-        console.log('Using fallback products:', error)
+        console.error('Error fetching products:', error)
+        // Use fallback products only on error, not when empty
+        setProducts(fallbackProducts)
       } finally {
         setLoading(false)
       }
@@ -179,6 +179,18 @@ const Shop = () => {
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="animate-pulse text-kodeen-gray-400">Loading products...</div>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <ShoppingBag className="w-16 h-16 text-kodeen-gray-300 mb-4" />
+              <h3 className="text-2xl font-display font-medium text-kodeen-gray-600 mb-2">
+                {activeCategory === 'All' ? 'No Products Available' : `No ${activeCategory} Products`}
+              </h3>
+              <p className="text-kodeen-gray-400 max-w-md">
+                {activeCategory === 'All' 
+                  ? 'Check back soon for new products and resources.'
+                  : 'Try selecting a different category or check back later.'}
+              </p>
             </div>
           ) : (
             <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

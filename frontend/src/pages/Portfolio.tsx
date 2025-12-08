@@ -74,7 +74,7 @@ const fallbackProjects = [
 ]
 
 const Portfolio = () => {
-  const [projects, setProjects] = useState<Project[]>(fallbackProjects)
+  const [projects, setProjects] = useState<Project[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
@@ -87,14 +87,12 @@ const Portfolio = () => {
           portfolioApi.getProjects(),
           portfolioApi.getCategories(),
         ])
-        if (projectsData.length > 0) {
-          setProjects(projectsData)
-        }
-        if (categoriesData.length > 0) {
-          setCategories(categoriesData)
-        }
+        setProjects(projectsData)
+        setCategories(categoriesData)
       } catch (error) {
-        console.log('Using fallback data:', error)
+        console.error('Error fetching portfolio data:', error)
+        // Use fallback only on error
+        setProjects(fallbackProjects)
       } finally {
         setLoading(false)
       }
@@ -167,6 +165,18 @@ const Portfolio = () => {
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="animate-pulse text-kodeen-gray-400">Loading projects...</div>
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <Play className="w-16 h-16 text-kodeen-gray-300 mb-4" />
+              <h3 className="text-2xl font-display font-medium text-kodeen-gray-600 mb-2">
+                {activeCategory === 'All' ? 'No Projects Available' : `No ${activeCategory} Projects`}
+              </h3>
+              <p className="text-kodeen-gray-400 max-w-md">
+                {activeCategory === 'All' 
+                  ? 'Check back soon for new projects and work samples.'
+                  : 'Try selecting a different category or check back later.'}
+              </p>
             </div>
           ) : (
             <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

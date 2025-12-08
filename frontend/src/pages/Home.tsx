@@ -7,42 +7,6 @@ import ProjectModal from '../components/ProjectModal'
 import ProductModal from '../components/ProductModal'
 import { useCart } from '../context/CartContext'
 
-const fallbackProjects = [
-  {
-    id: 1,
-    title: 'Midnight Echoes',
-    slug: 'midnight-echoes',
-    category: { id: 1, name: 'Music Video', slug: 'music-videos' },
-    thumbnail: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&q=80',
-    video_url: '',
-    description: '',
-    year: 2024,
-    featured: true,
-  },
-  {
-    id: 2,
-    title: 'Urban Pulse',
-    slug: 'urban-pulse',
-    category: { id: 2, name: 'Commercial', slug: 'commercials' },
-    thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&q=80',
-    video_url: '',
-    description: '',
-    year: 2024,
-    featured: true,
-  },
-  {
-    id: 3,
-    title: 'Beyond the Frame',
-    slug: 'beyond-the-frame',
-    category: { id: 3, name: 'Short Film', slug: 'short-films' },
-    thumbnail: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80',
-    video_url: '',
-    description: '',
-    year: 2023,
-    featured: true,
-  },
-]
-
 const stats = [
   { icon: Film, value: '150+', label: 'Projects Completed' },
   { icon: Award, value: '12', label: 'Awards Won' },
@@ -55,7 +19,7 @@ const iconMap: Record<string, typeof Video> = {
 
 const Home = () => {
   const heroRef = useRef<HTMLDivElement>(null)
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>(fallbackProjects)
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [services, setServices] = useState<Service[]>([])
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
@@ -274,44 +238,50 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {featuredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div
-                  onClick={() => setSelectedProject(project.slug)}
-                  className="group block cursor-pointer"
+          {featuredProjects.length === 0 ? (
+            <div className="text-center py-12 text-kodeen-gray-400">
+              <p>No featured projects available at the moment.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
                 >
-                  <div className="portfolio-card aspect-[4/5] rounded-lg overflow-hidden mb-4">
-                    <img
-                      src={project.thumbnail}
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="w-16 h-16 rounded-full bg-white flex items-center justify-center"
-                      >
-                        <Play className="w-6 h-6 text-kodeen-black ml-1" />
-                      </motion.div>
+                  <div
+                    onClick={() => setSelectedProject(project.slug)}
+                    className="group block cursor-pointer"
+                  >
+                    <div className="portfolio-card aspect-[4/5] rounded-lg overflow-hidden mb-4">
+                      <img
+                        src={project.thumbnail}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          className="w-16 h-16 rounded-full bg-white flex items-center justify-center"
+                        >
+                          <Play className="w-6 h-6 text-kodeen-black ml-1" />
+                        </motion.div>
+                      </div>
                     </div>
+                    <p className="text-kodeen-gray-400 text-xs tracking-wider uppercase mb-1">
+                      {project.category.name}
+                    </p>
+                    <h3 className="font-display text-xl font-medium group-hover:text-kodeen-gray-600 transition-colors">
+                      {project.title}
+                    </h3>
                   </div>
-                  <p className="text-kodeen-gray-400 text-xs tracking-wider uppercase mb-1">
-                    {project.category.name}
-                  </p>
-                  <h3 className="font-display text-xl font-medium group-hover:text-kodeen-gray-600 transition-colors">
-                    {project.title}
-                  </h3>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
           <div className="md:hidden mt-10 text-center">
             <Link to="/portfolio" className="btn-secondary inline-flex items-center gap-2">
