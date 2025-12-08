@@ -238,7 +238,7 @@ const Layout = ({ children }: LayoutProps) => {
             </div>
           </div>
           <div className="border-t border-kodeen-gray-100 mt-12 pt-8 text-center text-sm text-kodeen-gray-400">
-            <p>&copy; {new Date().getFullYear()} Kodeen Hunter. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Kodeen Hunter. All rights reserved. &bull; Powered by Sama Lte Ltd</p>
           </div>
         </div>
       </footer>
