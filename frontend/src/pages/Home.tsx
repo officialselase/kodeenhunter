@@ -484,10 +484,14 @@ const Home = () => {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => {
+                          const price = typeof product.current_price === 'number' 
+                            ? product.current_price 
+                            : parseFloat(String(product.current_price))
+                          
                           addItem({
                             id: product.id,
                             name: product.name,
-                            price: product.current_price,
+                            price: price,
                             image: product.image,
                           })
                           setAddedItems((prev) => [...prev, product.id])
