@@ -50,19 +50,19 @@ const Home = () => {
           shopApi.getFeaturedProducts()
         ])
         
-        if (projects.status === 'fulfilled' && projects.value.length > 0) {
+        if (projects.status === 'fulfilled') {
           setFeaturedProjects(projects.value.slice(0, 3))
         }
-        if (servicesData.status === 'fulfilled' && servicesData.value.length > 0) {
+        if (servicesData.status === 'fulfilled') {
           setServices(servicesData.value)
         }
-        if (testimonialsData.status === 'fulfilled' && testimonialsData.value.length > 0) {
+        if (testimonialsData.status === 'fulfilled') {
           setTestimonials(testimonialsData.value)
         }
-        if (awardsData.status === 'fulfilled' && awardsData.value.length > 0) {
+        if (awardsData.status === 'fulfilled') {
           setAwards(awardsData.value)
         }
-        if (products.status === 'fulfilled' && products.value.length > 0) {
+        if (products.status === 'fulfilled') {
           setFeaturedProducts(products.value.slice(0, 3))
         }
       } catch (error) {

@@ -87,8 +87,11 @@ const Portfolio = () => {
           portfolioApi.getProjects(),
           portfolioApi.getCategories(),
         ])
-        setProjects(projectsData)
-        setCategories(categoriesData)
+        // Handle both paginated and non-paginated responses
+        const projectList = Array.isArray(projectsData) ? projectsData : (projectsData as any).results || []
+        const categoryList = Array.isArray(categoriesData) ? categoriesData : (categoriesData as any).results || []
+        setProjects(projectList)
+        setCategories(categoryList)
       } catch (error) {
         console.error('Error fetching portfolio data:', error)
         // Use fallback only on error

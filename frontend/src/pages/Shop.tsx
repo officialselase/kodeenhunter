@@ -104,7 +104,9 @@ const Shop = () => {
     const fetchProducts = async () => {
       try {
         const data = await shopApi.getProducts()
-        setProducts(data)
+        // Handle both paginated and non-paginated responses
+        const productList = Array.isArray(data) ? data : (data as any).results || []
+        setProducts(productList)
       } catch (error) {
         console.error('Error fetching products:', error)
         // Use fallback products only on error, not when empty
