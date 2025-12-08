@@ -77,6 +77,7 @@ urlpatterns = [
     path('api/portfolio/', include('portfolio.urls')),
     path('api/shop/', include('shop.urls')),
     path('api/booking/', include('booking.urls')),
+    path('api/newsletter/', include('subscribers.urls')),
     path('robots.txt', robots_txt),
     path('sitemap.xml', sitemap_xml),
 ]

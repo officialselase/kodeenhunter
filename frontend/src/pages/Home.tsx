@@ -2,10 +2,11 @@ import { useRef, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Play, ArrowRight, Award, Film, Users, Star, Quote, Video, Camera, Palette, Music, Plane, ShoppingBag, Eye, Check } from 'lucide-react'
-import { portfolioApi, shopApi, homepageApi, Project, Service, Testimonial, Award as AwardType, Product } from '../services/api'
+import { portfolioApi, shopApi, homepageApi, newsletterApi, Project, Service, Testimonial, Award as AwardType, Product } from '../services/api'
 import ProjectModal from '../components/ProjectModal'
 import ProductModal from '../components/ProductModal'
 import { useCart } from '../context/CartContext'
+import { trackContact } from '../utils/analytics'
 
 const stats = [
   { icon: Film, value: '150+', label: 'Projects Completed' },
@@ -28,6 +29,9 @@ const Home = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [addedItems, setAddedItems] = useState<number[]>([])
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [newsletterMessage, setNewsletterMessage] = useState('')
   const { addItem } = useCart()
 
   const { scrollYProgress } = useScroll({
@@ -654,11 +658,36 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault()
-              const email = (e.target as HTMLFormElement).email.value
-              alert(`Thanks for subscribing with ${email}! (Newsletter integration coming soon)`)
-              ;(e.target as HTMLFormElement).reset()
+              setNewsletterStatus('loading')
+              setNewsletterMessage('')
+              
+              try {
+                const response = await newsletterApi.subscribe({
+                  email: newsletterEmail,
+                  source: 'homepage'
+                })
+                setNewsletterStatus('success')
+                setNewsletterMessage(response.message)
+                setNewsletterEmail('')
+                trackContact.submitForm('newsletter')
+                
+                // Reset success message after 5 seconds
+                setTimeout(() => {
+                  setNewsletterStatus('idle')
+                  setNewsletterMessage('')
+                }, 5000)
+              } catch (error) {
+                setNewsletterStatus('error')
+                setNewsletterMessage(error instanceof Error ? error.message : 'Failed to subscribe. Please try again.')
+                
+                // Reset error message after 5 seconds
+                setTimeout(() => {
+                  setNewsletterStatus('idle')
+                  setNewsletterMessage('')
+                }, 5000)
+              }
             }}
             className="max-w-md mx-auto"
           >
@@ -666,20 +695,31 @@ const Home = () => {
               <input
                 type="email"
                 name="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
-                className="flex-1 px-4 py-3 rounded-lg border border-kodeen-gray-300 focus:outline-none focus:border-kodeen-black transition-colors"
+                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                className="flex-1 px-4 py-3 rounded-lg border border-kodeen-gray-300 focus:outline-none focus:border-kodeen-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 type="submit"
-                className="btn-primary whitespace-nowrap"
+                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                className="btn-primary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Subscribe
+                {newsletterStatus === 'loading' ? 'Subscribing...' : newsletterStatus === 'success' ? 'Subscribed!' : 'Subscribe'}
               </button>
             </div>
-            <p className="text-xs text-kodeen-gray-400 mt-3 text-center">
-              No spam, unsubscribe anytime. Your privacy is important to us.
-            </p>
+            {newsletterMessage && (
+              <p className={`text-sm mt-3 text-center ${newsletterStatus === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {newsletterMessage}
+              </p>
+            )}
+            {!newsletterMessage && (
+              <p className="text-xs text-kodeen-gray-400 mt-3 text-center">
+                No spam, unsubscribe anytime. Your privacy is important to us.
+              </p>
+            )}
           </motion.form>
         </div>
       </section>

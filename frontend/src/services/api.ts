@@ -261,4 +261,23 @@ export const homepageApi = {
   getAwards: () => apiClient.get<Award[]>('/portfolio/awards/featured/'),
 }
 
+export interface NewsletterSubscription {
+  email: string
+  name?: string
+  source?: string
+}
+
+export interface NewsletterResponse {
+  message: string
+}
+
+export const newsletterApi = {
+  subscribe: (data: NewsletterSubscription) => 
+    apiClient.post<NewsletterResponse>('/newsletter/subscribe/', data),
+  unsubscribe: (email: string) => 
+    apiClient.post<NewsletterResponse>('/newsletter/unsubscribe/', { email }),
+  checkStatus: (email: string) => 
+    apiClient.get<{ subscribed: boolean; subscribed_at?: string }>(`/newsletter/status/?email=${email}`),
+}
+
 export default apiClient
