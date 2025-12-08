@@ -78,7 +78,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [projects, servicesData, testimonialsData, awardsData, products] = await Promise.all([
+        const [projects, servicesData, testimonialsData, awardsData, products] = await Promise.allSettled([
           portfolioApi.getFeaturedProjects(),
           homepageApi.getServices(),
           homepageApi.getTestimonials(),
@@ -86,13 +86,23 @@ const Home = () => {
           shopApi.getFeaturedProducts()
         ])
         
-        if (projects.length > 0) setFeaturedProjects(projects.slice(0, 3))
-        if (servicesData.length > 0) setServices(servicesData)
-        if (testimonialsData.length > 0) setTestimonials(testimonialsData)
-        if (awardsData.length > 0) setAwards(awardsData)
-        if (products.length > 0) setFeaturedProducts(products.slice(0, 3))
+        if (projects.status === 'fulfilled' && projects.value.length > 0) {
+          setFeaturedProjects(projects.value.slice(0, 3))
+        }
+        if (servicesData.status === 'fulfilled' && servicesData.value.length > 0) {
+          setServices(servicesData.value)
+        }
+        if (testimonialsData.status === 'fulfilled' && testimonialsData.value.length > 0) {
+          setTestimonials(testimonialsData.value)
+        }
+        if (awardsData.status === 'fulfilled' && awardsData.value.length > 0) {
+          setAwards(awardsData.value)
+        }
+        if (products.status === 'fulfilled' && products.value.length > 0) {
+          setFeaturedProducts(products.value.slice(0, 3))
+        }
       } catch (error) {
-        console.log('Using fallback data:', error)
+        console.error('Error fetching homepage data:', error)
       }
     }
     fetchData()
