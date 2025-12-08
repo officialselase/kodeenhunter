@@ -80,7 +80,9 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                         <div className="flex-1">
                           <h3 className="font-medium text-sm">{item.name}</h3>
                           <p className="text-kodeen-gray-500 text-sm mt-1">
-                            ${item.price.toFixed(2)}
+                            ${typeof item.price === 'number' 
+                              ? item.price.toFixed(2) 
+                              : parseFloat(String(item.price)).toFixed(2)}
                           </p>
                           <div className="flex items-center gap-3 mt-2">
                             <button
@@ -116,7 +118,9 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                 <div className="border-t border-kodeen-gray-100 p-6 space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-kodeen-gray-500">Subtotal</span>
-                    <span className="font-semibold">${total.toFixed(2)}</span>
+                    <span className="font-semibold">${typeof total === 'number' 
+                      ? total.toFixed(2) 
+                      : parseFloat(String(total)).toFixed(2)}</span>
                   </div>
                   <button onClick={handleCheckout} className="btn-primary w-full text-center">
                     Checkout

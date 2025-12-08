@@ -125,10 +125,14 @@ const Shop = () => {
     : products.filter((p) => p.category.name === activeCategory)
 
   const handleAddToCart = (product: Product) => {
+    const price = typeof product.current_price === 'number' 
+      ? product.current_price 
+      : parseFloat(String(product.current_price))
+    
     addItem({
       id: product.id,
       name: product.name,
-      price: product.current_price,
+      price: price,
       image: product.image,
     })
     setAddedItems((prev) => [...prev, product.id])
@@ -267,7 +271,9 @@ const Shop = () => {
 
                     <div className="flex items-center gap-2">
                       <span className="font-display text-xl font-bold">
-                        ${product.current_price.toFixed(2)}
+                        ${typeof product.current_price === 'number' 
+                          ? product.current_price.toFixed(2) 
+                          : parseFloat(String(product.current_price)).toFixed(2)}
                       </span>
                       {product.sale_price && (
                         <span className="text-kodeen-gray-400 line-through text-sm">

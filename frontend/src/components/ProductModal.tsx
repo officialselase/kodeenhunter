@@ -37,10 +37,14 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
   if (!product) return null
 
   const handleAddToCart = () => {
+    const price = typeof product.current_price === 'number' 
+      ? product.current_price 
+      : parseFloat(String(product.current_price))
+    
     addItem({
       id: product.id,
       name: product.name,
-      price: product.current_price,
+      price: price,
       image: product.image,
     })
     setAdded(true)
@@ -101,7 +105,9 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
                       </h2>
                       <div className="flex items-center gap-3 mb-4">
                         <span className="font-display text-2xl font-bold">
-                          ${product.current_price.toFixed(2)}
+                          ${typeof product.current_price === 'number' 
+                            ? product.current_price.toFixed(2) 
+                            : parseFloat(String(product.current_price)).toFixed(2)}
                         </span>
                         {product.sale_price && (
                           <>
@@ -109,7 +115,9 @@ const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
                               ${parseFloat(product.price).toFixed(2)}
                             </span>
                             <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                              SAVE ${(parseFloat(product.price) - product.current_price).toFixed(2)}
+                              SAVE ${(parseFloat(product.price) - (typeof product.current_price === 'number' 
+                                ? product.current_price 
+                                : parseFloat(String(product.current_price)))).toFixed(2)}
                             </span>
                           </>
                         )}

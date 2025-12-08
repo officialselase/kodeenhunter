@@ -35,7 +35,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
     // Load cart from localStorage on mount
     const stored = secureStorage.getItem(CART_STORAGE_KEY)
-    return stored || []
+    if (stored && Array.isArray(stored)) {
+      // Ensure prices are numbers when loading from storage
+      return stored.map(item => ({
+        ...item,
+        price: typeof item.price === 'number' ? item.price : parseFloat(String(item.price))
+      }))
+    }
+    return []
   })
   const [isCheckingOut, setIsCheckingOut] = useState(false)
 

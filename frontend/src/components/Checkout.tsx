@@ -145,13 +145,13 @@ const Checkout = ({ isOpen, onClose }: CheckoutProps) => {
                                 {item.name} × {item.quantity}
                               </span>
                               <span className="font-medium">
-                                ${(item.price * item.quantity).toFixed(2)}
+                                ${((typeof item.price === 'number' ? item.price : parseFloat(String(item.price))) * item.quantity).toFixed(2)}
                               </span>
                             </div>
                           ))}
                           <div className="border-t border-kodeen-gray-200 pt-2 mt-2 flex justify-between font-semibold">
                             <span>Total</span>
-                            <span>${total.toFixed(2)}</span>
+                            <span>${typeof total === 'number' ? total.toFixed(2) : parseFloat(String(total)).toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -289,14 +289,14 @@ const Checkout = ({ isOpen, onClose }: CheckoutProps) => {
                                 {item.name} × {item.quantity}
                               </span>
                               <span className="font-medium">
-                                ${(item.price * item.quantity).toFixed(2)}
+                                ${((typeof item.price === 'number' ? item.price : parseFloat(String(item.price))) * item.quantity).toFixed(2)}
                               </span>
                             </div>
                           ))}
                         </div>
                         <div className="border-t border-kodeen-gray-200 pt-2 flex justify-between font-semibold text-base">
                           <span>Total</span>
-                          <span>${total.toFixed(2)}</span>
+                          <span>${typeof total === 'number' ? total.toFixed(2) : parseFloat(String(total)).toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -325,7 +325,7 @@ const Checkout = ({ isOpen, onClose }: CheckoutProps) => {
                       ) : (
                         <>
                           <Lock className="w-5 h-5" />
-                          Place Order - ${total.toFixed(2)}
+                          Place Order - ${typeof total === 'number' ? total.toFixed(2) : parseFloat(String(total)).toFixed(2)}
                         </>
                       )}
                     </button>

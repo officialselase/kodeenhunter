@@ -110,7 +110,7 @@ export interface Product {
   category: { id: number; name: string; slug: string }
   price: string
   sale_price: string | null
-  current_price: number
+  current_price: number | string
   description?: string
   short_description?: string
   image: string
