@@ -64,28 +64,12 @@ const Layout = ({ children }: LayoutProps) => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <svg width="40" height="40" viewBox="0 0 80 80" className="text-kodeen-black">
-                <path
-                  d="M40 15 L40 65 M28 28 L40 40 L28 52 M52 28 L40 40 L52 52"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="32"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill="none"
-                />
-              </svg>
+              <img 
+                src="/kodeen-logo1.jpeg" 
+                alt="Kodeen Hunter" 
+                className="h-10 w-auto"
+              />
             </motion.div>
-            <span className="font-display text-lg font-semibold tracking-tight hidden sm:block">
-              KODEEN HUNTER
-            </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-10">
@@ -138,7 +122,11 @@ const Layout = ({ children }: LayoutProps) => {
             className="fixed inset-0 z-50 bg-white"
           >
             <div className="p-6 flex justify-between items-center">
-              <span className="font-display text-lg font-semibold">KODEEN HUNTER</span>
+              <img 
+                src="/kodeen-logo2.jpeg" 
+                alt="Kodeen Hunter" 
+                className="h-8 w-auto"
+              />
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 hover:bg-kodeen-gray-100 rounded-full transition-colors"
@@ -194,19 +182,12 @@ const Layout = ({ children }: LayoutProps) => {
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="grid md:grid-cols-4 gap-10">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <svg width="32" height="32" viewBox="0 0 80 80" className="text-kodeen-black">
-                  <path
-                    d="M40 15 L40 65 M28 28 L40 40 L28 52 M52 28 L40 40 L52 52"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                  <circle cx="40" cy="40" r="32" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                </svg>
-                <span className="font-display text-lg font-semibold">KODEEN HUNTER</span>
+              <div className="flex items-center mb-4">
+                <img 
+                  src="/kodeen-logo1.jpeg" 
+                  alt="Kodeen Hunter" 
+                  className="h-8 w-auto"
+                />
               </div>
               <p className="text-kodeen-gray-500 text-sm max-w-sm">
                 Crafting visual stories that captivate and inspire. Professional videography for music videos, commercials, and creative projects.
